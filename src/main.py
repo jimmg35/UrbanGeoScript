@@ -3,17 +3,17 @@ import pandas as pd
 from os import listdir
 
 
-##################
-#   @self.multiClassData
-#   3_classes
-#   
 
-class Parameter():
+#   Author   : @jimmg35
+#   Function : preparing dataset for population analysis
+
+class ParameterSet():
     DATA_PATH = r'D:\UrbanGeo\cleanData'
     CODBASE = "最小統計區代碼"
     DATA_COLUMN = ["0-14歲人口數" ,"15-64歲人口數", "65歲以上人口數"]
 
-class Converter(Parameter):
+
+class Converter(ParameterSet):
     def __init__(self):
         self.data_path = [os.path.join(self.DATA_PATH, i) for i in listdir(self.DATA_PATH)]
         # MultiYear data (104~108)
@@ -42,33 +42,24 @@ class Converter(Parameter):
         return out
         
     def column_subtract(self, f, t):
-        out = []
-        for i in range(0, len(f)):
-            out.append(t[i] - f[i])
-        return out            
+        return [t[i] - f[i] for i in range(0, len(f))]        
     
     def output_delta_csv(self, data):
         out = {}
-        d = []
-        columns = []
-        
+        columns = d = []
         for i in range(0, len(self.DATA_COLUMN)): # for a class
             for j in range(0, len(data[i])): # for years
                 columns.append('d'+self.DATA_COLUMN[i]+'_'+str(j+4)+'to'+str(j+5))
                 print('d'+self.DATA_COLUMN[i]+'_'+str(j+4)+'to'+str(j+5))
-        
         for i in range(0, len(data)):
             for j in range(0, len(self.data_set)-1):
                 d.append(data[i][j])
-        
         for i in range(0, len(columns)):
             out[columns[i]] = d[i]
-         
         for i in range(0, len(d)):
             for j in range(0, len(d[i])):
                 if self.isNaN(d[i][j]):
                     d[i][j] = 0
-
         out["CODEBASE"] = self.data_set[0][self.CODBASE]
         processed = pd.DataFrame(data=out)
         processed.to_csv('output.csv')
